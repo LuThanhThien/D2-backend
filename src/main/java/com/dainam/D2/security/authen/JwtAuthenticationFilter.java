@@ -39,7 +39,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) {
         try {
-            if (request.getServletPath().contains("/api/v1/auth")) {
+            if (request.getServletPath().contains("/api/v1/auth") &&
+                !request.getServletPath().endsWith("/auth/profile")
+            ) {
                 // ignore the endpoint "api/v1/auth"
                 filterChain.doFilter(request, response);
                 return;

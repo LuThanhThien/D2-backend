@@ -19,6 +19,8 @@ public interface IUserService extends UserDetailsService {
     // CREATE
     User save(User user);
 
+    User uploadDesignation(MultipartFile designation, String username);
+
     // READ
     List<User> findAll();
 

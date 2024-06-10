@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
+@Builder
 @Embeddable
 public class UserProfile {
 

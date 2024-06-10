@@ -1,6 +1,7 @@
 package com.dainam.D2.models.global;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -50,4 +51,8 @@ public abstract class AuditEntity {
             insertable = false
     )
     protected String lastModifiedBy;
+
+    @Column(name = "data_status")
+    @Builder.Default
+    protected DataStatus dataStatus = DataStatus.ACTIVE;
 }

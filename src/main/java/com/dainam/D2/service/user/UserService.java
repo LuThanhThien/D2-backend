@@ -4,8 +4,9 @@ import com.dainam.D2.dto.user.UserDto;
 import com.dainam.D2.mapper.user.UserMapper;
 import com.dainam.D2.models.auth.Role;
 import com.dainam.D2.models.user.User;
+import com.dainam.D2.models.user.UserProfile;
 import com.dainam.D2.repository.user.IUserRepository;
-import com.dainam.D2.utils.UploadFile;
+import com.dainam.D2.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.security.sasl.AuthenticationException;
 import java.util.List;
@@ -33,6 +35,28 @@ public class UserService implements IUserService {
     @Override
     public User save(User user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public User uploadDesignation(MultipartFile designation, String username) {
+        User user = this.findByUsername(username);
+        log.info("Current user is: {}", username);
+        UserProfile userProfile = user.getProfile();
+        if (userProfile == null) {
+            user.setProfile(new UserProfile());
+        }
+        log.info("Current user profile: {}", user.getProfile());
+        String currentDesignation = user.getProfile().getDesignation();
+        try {
+            user.getProfile().setDesignation(FileUtils.upload(designation));
+            user = userRepository.save(user);
+            if(currentDesignation != null && FileUtils.fileExist(currentDesignation)){
+                FileUtils.delete(currentDesignation);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return user;
     }
 
     // READ

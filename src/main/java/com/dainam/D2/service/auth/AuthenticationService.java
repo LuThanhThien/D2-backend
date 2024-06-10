@@ -10,6 +10,7 @@ import com.dainam.D2.models.auth.Role;
 import com.dainam.D2.models.auth.Token;
 import com.dainam.D2.models.auth.TokenType;
 import com.dainam.D2.models.user.User;
+import com.dainam.D2.models.user.UserProfile;
 import com.dainam.D2.repository.auth.ITokenRepository;
 import com.dainam.D2.repository.user.IUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -100,11 +101,23 @@ public class AuthenticationService implements IAuthenticationService {
         user.setRole(Role.USER);
         userRepository.save(user);
 
-        log.info("Register successfully");
-        logUserInfo();
+        var jwtToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
+        revokeAllUserTokens(user);
+        deleteOldUserTokens(user);
+        saveUserToken(user, jwtToken);
+        user.updateLastLogin();
 
-        return AuthenticationMapper.INSTANCE
+        log.info("Register successfully");
+        log.info("Extracted username: " + jwtService.extractUsername(jwtToken));
+        log.info("JWT Token: " + jwtToken);
+        logUserInfo();
+        AuthenticationResponse response = AuthenticationMapper.INSTANCE
                 .toDto(user);
+        response.setAccessToken(jwtToken);
+        response.setRefreshToken(refreshToken);
+
+        return response;
     }
 
     public AuthenticationResponse login(LoginRequest loginRequest) {
@@ -266,6 +279,13 @@ public class AuthenticationService implements IAuthenticationService {
 
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("authentication.getPrincipal(): {}", authentication.getPrincipal());
+        if (!(authentication.getPrincipal() instanceof User))
+            try {
+                throw new AuthenticationException("User has not logged in");
+            } catch (AuthenticationException e) {
+                throw new RuntimeException(e);
+            }
         return (User) authentication.getPrincipal();
     }
 }

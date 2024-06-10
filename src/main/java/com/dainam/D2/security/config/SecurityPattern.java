@@ -10,6 +10,7 @@ public class SecurityPattern {
     };
     protected static final String[] USER_API = {
             "/api/user/**",
+            "/api/item/**"
     };
     protected static final String[] WHITE_LIST_API = {
             "/api/auth/**",

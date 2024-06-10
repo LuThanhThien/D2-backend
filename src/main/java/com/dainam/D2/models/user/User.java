@@ -4,6 +4,7 @@ import com.dainam.D2.models.auth.Role;
 import com.dainam.D2.models.auth.Token;
 import com.dainam.D2.models.global.DataStatus;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -30,8 +31,6 @@ public class User implements UserDetails {
     private Long id;
 
     // USER INFORMATION
-    private String fullName;
-
     private LocalDate dob;
 
     private String phoneNumber;
@@ -40,8 +39,9 @@ public class User implements UserDetails {
 
     private String lastName;
 
-    @Embedded
-    private UserProfile profile;
+    @JsonValue
+    @Builder.Default
+    private UserProfile profile = new UserProfile();
 
     // SECURITY
     private String username;
@@ -115,6 +115,7 @@ public class User implements UserDetails {
     public void updateLastChangePassword() {
         this.lastChangePasswordDatetime = LocalDateTime.now();
     }
+
 }
 
 

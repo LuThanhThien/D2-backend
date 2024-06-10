@@ -32,8 +32,6 @@ public class UserDto {
     @NotEmpty
     private String username;
 
-    private String fullName;
-
     private LocalDate dob;
 
     private String phoneNumber;
@@ -42,7 +40,6 @@ public class UserDto {
 
     private String lastName;
 
-    @Dto.Forward(mappedField = "profile", mappedBy = "designation")
-    private String designation;
+    private UserProfile profile;
 
 }
